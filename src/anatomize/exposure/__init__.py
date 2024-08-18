@@ -1,3 +1,3 @@
-from .basic import AnatomizeDataArrayAccessor, adjust_gamma, iter_channels
+from .basic import adjust_gamma
 
-__all__ = ["iter_channels", "AnatomizeDataArrayAccessor", "adjust_gamma"]
+__all__ = ["adjust_gamma"]
