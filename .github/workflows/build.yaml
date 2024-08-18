@@ -11,13 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  package:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.ref }}
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python
         uses: eifinger/setup-rye@v4
         with:
           version: "latest"
@@ -29,6 +29,8 @@ jobs:
         run: |
           rye sync
       - name: Build Package
-        run: rye build
+        run: |
+          rye build
       - name: Check package
-        run: rye run twine check --strict dist/*.whl
+        run: |
+          rye run twine check --strict dist/*.whl
