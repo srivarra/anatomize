@@ -1,0 +1,104 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs"]
+
+[project]
+name = "anatomize"
+dynamic = ["version"]
+description = "A very interesting piece of code"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Sricharan Reddy Varra" }]
+maintainers = [
+    { name = "Sricharan Reddy Varra", email = "srivarra@stanford.edu" },
+]
+urls.Documentation = "https://anatomize.readthedocs.io/"
+urls.Source = "https://github.com/srivarra/anatomize"
+urls.Home-page = "https://github.com/srivarra/anatomize"
+dependencies = [
+    "anndata",
+    # for debug logging (referenced from the issue template)
+    "session-info",
+    "spatialdata>=0.2.2",
+    "xarray[accel,parallel]",
+    "dask[array,distributed,diagnostics]",
+    "numpy",
+    "numba",
+    "pandas[performance]",
+    "numpydantic[zarr,dask]>=1.3.2",
+    "flox>=0.9.9",
+    "einx>=0.3.0",
+    "xbatcher>=0.3.0",
+    "universal-pathlib>=0.2.2",
+    "numbagg>=0.8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "twine>=4.0.2",
+    "esbonio>=0.16.4",
+    "anatomize[nb]",
+    "matplotlib>=3.9.2",
+    "hvplot>=0.10.0",
+    "spatialdata-plot>=0.2.4",
+    "asv>=0.6.4",
+]
+doc = [
+    "docutils>=0.8,!=0.18.*,!=0.19.*",
+    "sphinx>=4",
+    "sphinx-book-theme>=1.0.0",
+    "myst-nb>=1.1.0",
+    "sphinxcontrib-bibtex>=1.0.0",
+    "setuptools",
+    # Until pybtex >0.23.0 releases: https://bitbucket.org/pybtex-devs/pybtex/issues/169/
+    "sphinx-autodoc-typehints",
+    "sphinxext-opengraph",
+    # For notebooks
+    "ipykernel",
+    "ipython",
+    "sphinx-copybutton",
+    "pandas",
+]
+nb = [
+    "jupyterlab",
+    "notebook",
+    "ipylab>=1.0.0",
+    "buckaroo>=0.6.12",
+    "jupyter-bokeh>=4.0.5",
+]
+test = [
+    "pytest",
+    "coverage",
+    "hypothesis>=6.111.1",
+]
+jax = [
+    "jax-metal>=0.1.0",
+    "jax>=0.4.31",
+    "jaxlib>=0.4.31",
+    "equinox>=0.11.4",
+]
+
+[tool.coverage.run]
+source = ["anatomize"]
+omit = ["**/test_*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+xfail_strict = true
+addopts = [
+    "--import-mode=importlib", # allow using test files with same name
+]
+
+[tool.cruft]
+skip = [
+    "tests",
+    "src/**/__init__.py",
+    "src/**/basic.py",
+    "docs/api.md",
+    "docs/changelog.md",
+    "docs/references.bib",
+    "docs/references.md",
+    "docs/notebooks/example.ipynb",
+]

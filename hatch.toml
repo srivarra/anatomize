@@ -1,0 +1,8 @@
+[version]
+source = "vcs"
+
+[build.targets.wheel]
+packages = ["src/anatomize"]
+
+[metadata]
+allow-direct-references = true
