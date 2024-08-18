@@ -52,7 +52,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          rye sync --update-all --all-features
+          rye sync --update-all --features=test,ci
 
       - name: Test
         env:
