@@ -74,12 +74,6 @@ test = [
     "hypothesis>=6.111.1",
     "pytest-cov>=5.0.0",
 ]
-jax = [
-    "jax-metal>=0.1.0",
-    "jax>=0.4.31",
-    "jaxlib>=0.4.31",
-    "equinox>=0.11.4",
-]
 
 [tool.coverage.run]
 source = ["anatomize"]
