@@ -12,7 +12,7 @@
 [badge-codecov]: https://codecov.io/github/srivarra/anatomize/graph/badge.svg?token=H78BXNGI6W
 [badge-ruff]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
 
-A very interesting piece of code
+A small port of several scikit-image tools for SpatialData Labels2D and Images2D.
 
 ## Getting started
 
