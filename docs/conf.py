@@ -59,6 +59,8 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinxext.opengraph",
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
+    "scanpydoc",
+    "sphinx.ext.linkcode",
 ]
 
 autosummary_generate = True
@@ -96,6 +98,10 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),
+    "dask": ("https://docs.dask.org/en/stable/", None),
+    "datatree": ("https://datatree.readthedocs.io/en/latest/", None),
+    "spatialdata": ("https://spatialdata.readthedocs.io/en/latest/", None),
+    "zarr": ("https://zarr.readthedocs.io/en/stable/", None),
 }
 
 # List of patterns, relative to source directory, that match files and
@@ -127,5 +133,6 @@ pygments_style = "default"
 nitpick_ignore = [
     # If building the documentation fails because of a missing link that is outside your control,
     # you can add an exception to this list.
-    #     ("py:class", "igraph.Graph"),
+    # ("py:class", "igraph.Graph"),
+    # ("py:class", "optional")
 ]

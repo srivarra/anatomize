@@ -492,6 +492,8 @@ numpy-groupies==0.11.2
     # via flox
 numpydantic==1.3.3
     # via anatomize
+numpydoc==1.8.0
+    # via anatomize
 ome-zarr==0.9.0
     # via spatialdata
 opt-einsum==3.3.0
@@ -722,6 +724,8 @@ s3fs==0.6.0
     # via fsspec
 scanpy==1.10.2
     # via spatialdata-plot
+scanpydoc==0.13.6
+    # via anatomize
 scikit-image==0.24.0
     # via ome-zarr
     # via spatialdata
@@ -790,7 +794,9 @@ sphinx==8.0.2
     # via esbonio
     # via myst-nb
     # via myst-parser
+    # via numpydoc
     # via pydata-sphinx-theme
+    # via scanpydoc
     # via sphinx-autodoc-typehints
     # via sphinx-book-theme
     # via sphinx-copybutton
@@ -831,6 +837,7 @@ sympy==1.13.2
 tabulate==0.9.0
     # via asv
     # via jupyter-cache
+    # via numpydoc
 tblib==3.0.0
     # via distributed
 terminado==0.18.1

@@ -18,18 +18,20 @@ def normalize(
 
     Parameters
     ----------
-    stretch : float, default 1.0
-        A percentile stretch to apply before normalization between 0.0 and 0.1.
+    image
+        The image to normalize.
+    q
+        The minimum and maximum values to normalize the image to, by default (0.0, 1.0)
+    return_quantiles
+        Return the minimum and maximum values used to normalize the image, by default False.
+        If False, the normalized image is returned, if True a DataArray with the quantiles is returned.
+    **quantile_kwargs
+        Additional keyword arguments to pass to `xr.DataArray.quantile`
 
     Returns
     -------
-    xarray.DataArray
-        The dataset with normalized values.
-
-    Raises
-    ------
-    ValueError
-        If the stretch value is outside the valid range.
+    xr.DataArray
+        Either the normalized image or a DataArray with the quantiles used to normalize the image.
     """
     data = _rechunk(image, chunks=None)
 
@@ -55,20 +57,20 @@ def normalize(
 
 @convert_kwargs_to_xr_vec("gamma", "gain")
 def adjust_gamma(image: xr.DataArray, gamma: float = 1, gain: float = 1) -> xr.DataArray:
-    """Adjust the gamma of an image.
+    """Performs Gamma Correction on the input image.
 
     Parameters
     ----------
-    image : xarray.DataArray
+    image
         The image to adjust.
-    gamma : float, default 1
-        The gamma value to adjust the image by.
-    gain : float, default 1
-        The gain value to adjust the image by.
+    gamma
+        The gamma value to adjust the image by, by default 1
+    gain
+        The gain value to adjust the image by, by default 1
 
     Returns
     -------
-    xarray.DataArray
+    xr.DataArray
         The adjusted image.
     """
     data = _rechunk(image, chunks=None)

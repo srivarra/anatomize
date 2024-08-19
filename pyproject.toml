@@ -60,6 +60,8 @@ doc = [
     "ipython",
     "sphinx-copybutton",
     "pandas",
+    "numpydoc>=1.8.0",
+    "scanpydoc>=0.13.6",
 ]
 nb = [
     "jupyterlab",
