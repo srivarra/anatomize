@@ -30,6 +30,8 @@ jobs:
           - os: ubuntu-latest
             python: "3.10"
           - os: ubuntu-latest
+            python: "3.11"
+          - os: ubuntu-latest
             python: "3.12"
           - os: ubuntu-latest
             python: "3.12"
@@ -67,7 +69,7 @@ jobs:
           PLATFORM: ${{ matrix.os }}
           DISPLAY: :42
         run: |
-          rye run pytest --cov -v --color=yes --junitxml=junit.xml
+          rye run pytest --cov --cov-report=xml -v --color=yes --junitxml=junit.xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         env:
@@ -80,3 +82,5 @@ jobs:
         uses: codecov/test-results-action@v1
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          flags: ${{ matrix.os }}-${{ matrix.python }}
