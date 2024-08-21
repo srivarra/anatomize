@@ -1,0 +1,6 @@
+# This file is used to configure the uv package and project manager.
+# View the documentation for more information on how to configure this file below:
+# https://docs.astral.sh/uv/
+
+compile-bytecode = false
+upgrade = false

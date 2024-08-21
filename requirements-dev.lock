@@ -14,9 +14,9 @@ accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 aiobotocore==2.13.2
     # via s3fs
-aiohappyeyeballs==2.3.7
+aiohappyeyeballs==2.4.0
     # via aiohttp
-aiohttp==3.10.4
+aiohttp==3.10.5
     # via aiobotocore
     # via ome-zarr
 aioitertools==0.11.0
@@ -199,6 +199,8 @@ geopandas==1.0.1
     # via spatialdata
 graphlib-backport==1.1.0
     # via buckaroo
+greenlet==3.0.3
+    # via sqlalchemy
 h11==0.14.0
     # via httpcore
 h5py==3.11.0
@@ -224,12 +226,12 @@ idna==3.7
     # via yarl
 ijson==3.3.0
     # via codecov-cli
-imageio==2.35.0
+imageio==2.35.1
     # via pims
     # via scikit-image
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.2.0
+importlib-metadata==8.4.0
     # via asv-runner
     # via jupyter-cache
     # via myst-nb
@@ -255,7 +257,7 @@ isoduration==20.11.0
     # via jsonschema
 jaraco-classes==3.4.0
     # via keyring
-jaraco-context==5.3.0
+jaraco-context==6.0.1
     # via keyring
 jaraco-functools==4.0.2
     # via keyring
@@ -679,7 +681,7 @@ pyyaml==6.0.2
     # via myst-parser
     # via pre-commit
     # via pybtex
-pyzmq==26.1.0
+pyzmq==26.1.1
     # via ipykernel
     # via jupyter-client
     # via jupyter-server
@@ -734,7 +736,7 @@ scikit-learn==1.5.1
     # via scanpy
     # via spatialdata-plot
     # via umap-learn
-scipy==1.14.0
+scipy==1.14.1
     # via anndata
     # via dask-image
     # via datashader
@@ -754,11 +756,11 @@ send2trash==1.8.3
 session-info==1.0.0
     # via anatomize
     # via scanpy
-setuptools==72.2.0
+setuptools==73.0.1
     # via anatomize
     # via spatialdata
     # via tree-sitter
-shapely==2.0.5
+shapely==2.0.6
     # via geopandas
     # via spatialdata
 six==1.16.0
@@ -891,7 +893,7 @@ tree-sitter==0.20.4
     # via codecov-cli
 twine==5.1.1
     # via anatomize
-types-python-dateutil==2.9.0.20240316
+types-python-dateutil==2.9.0.20240821
     # via arrow
 typing-extensions==4.12.2
     # via myst-nb

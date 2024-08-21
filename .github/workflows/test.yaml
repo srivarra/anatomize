@@ -56,7 +56,7 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
-          cache-prefix: "${{ runner.os }}-rye-${{ matrix.python }}"
+          cache-prefix: "${{ matrix.os }}-rye-${{ matrix.python }}"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Dependencies
