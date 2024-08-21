@@ -16,7 +16,7 @@
 [badge-rye]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/rye/main/artwork/badge.json
 [badge-uv]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json
 
-A very interesting piece of code
+A small port of several scikit-image tools for SpatialData Labels2D and Images2D.
 
 ## Getting started
 
