@@ -56,7 +56,7 @@ def _gamma(Ic, gamma, gain, out):
     target="cpu",
 )
 def _log(Ic, gain, out):
-    out[:] = gain * np.log2(1 + Ic[:])
+    out[:] = gain[:] * np.log2(1 + Ic[:])
 
 
 @guvectorize(
@@ -67,4 +67,4 @@ def _log(Ic, gain, out):
     target="cpu",
 )
 def _inv_log(Ic, gain, out):
-    out[:] = gain * (2 ** Ic[:] - 1)
+    out[:] = gain[:] * (2 ** Ic[:] - 1)
