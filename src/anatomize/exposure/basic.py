@@ -3,7 +3,7 @@ import xbatcher as xb
 from spatialdata.models import C, X, Y
 
 from anatomize.core.decorators import convert_kwargs_to_xr_vec
-from anatomize.exposure._utils import _gamma, _inv_log, _log, _normalize, _rechunk
+from anatomize.exposure._utils import _gamma, _inv_log, _inv_sigmoid, _log, _normalize, _rechunk, _sigmoid
 
 
 def iter_channels(image: xr.DataArray) -> xb.BatchGenerator:  # noqa: D103
@@ -117,6 +117,43 @@ def adjust_log(image: xr.DataArray, gain: float = 1, inv=False) -> xr.DataArray:
         data,
         gain,
         input_core_dims=[[Y, X], []],
+        output_core_dims=[[Y, X]],
+        dask="parallelized",
+        output_dtypes=[data.dtype],
+        dask_gufunc_kwargs={"allow_rechunk": True},
+    )
+
+
+@convert_kwargs_to_xr_vec("cutoff", "gain")
+def adjust_sigmoid(image: xr.DataArray, cutoff: float = 0.5, gain: float = 10, inv=False) -> xr.DataArray:
+    """Performs Sigmoid Correction on the input image.
+
+    Parameters
+    ----------
+    image
+        The image to adjust.
+    cutoff
+        Cutoff of the sigmoid function that shifts the characteristic curve in horizontal direction, by default 0.5
+    gain
+        The constant multiplier in exponential's power of sigmoid function, by default 10
+    inv
+        If True, the negative sigmoid correction is performed, otherwise
+        the sigmoid correction is performed, by default False.
+
+    Returns
+    -------
+    The sigmoid adjusted image.
+    """
+    data = _rechunk(image, chunks=None)
+
+    f = _sigmoid if not inv else _inv_sigmoid
+
+    return xr.apply_ufunc(
+        f,
+        data,
+        cutoff,
+        gain,
+        input_core_dims=[[Y, X], [], []],
         output_core_dims=[[Y, X]],
         dask="parallelized",
         output_dtypes=[data.dtype],

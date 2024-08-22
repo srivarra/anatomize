@@ -11,4 +11,5 @@
 
     exposure.adjust_gamma
     exposure.adjust_log
+    exposure.adjust_sigmoid
 ```
