@@ -34,3 +34,19 @@ def test_adjust_log(blobs_sdata_store: UPath, gain: float, inv: bool):
         dims=blobs_sdata.images["blobs_image"].dims,
     )
     xr.testing.assert_allclose(a=blobs_image_log_xr, b=blobs_image_log_skimage, atol=1e-10)
+
+
+@pytest.mark.parametrize("cutoff,gain,inv", ([0.5, 10, True], [2.0, 20, False]))
+def test_adjust_sigmoid(blobs_sdata_store: UPath, cutoff: float, gain: float, inv: bool):
+    blobs_sdata = sd.read_zarr(blobs_sdata_store)
+
+    blobs_image_sigmoid_xr = an.exposure.adjust_sigmoid(
+        image=blobs_sdata.images["blobs_image"], cutoff=cutoff, gain=gain, inv=inv
+    )
+
+    blobs_image_sigmoid_skimage = xr.DataArray(
+        data=exposure.adjust_sigmoid(blobs_sdata.images["blobs_image"], cutoff=cutoff, gain=gain, inv=inv),
+        coords=blobs_sdata.images["blobs_image"].coords,
+        dims=blobs_sdata.images["blobs_image"].dims,
+    )
+    xr.testing.assert_allclose(a=blobs_image_sigmoid_xr, b=blobs_image_sigmoid_skimage, atol=1e-10)
