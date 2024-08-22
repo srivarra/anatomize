@@ -61,6 +61,7 @@ extensions = [
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
     "scanpydoc",
     "sphinx.ext.linkcode",
+    "sphinx.ext.mathjax",
 ]
 
 autosummary_generate = True

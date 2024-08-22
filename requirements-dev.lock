@@ -34,6 +34,8 @@ annotated-types==0.7.0
 anyio==4.4.0
     # via httpcore
     # via jupyter-server
+    # via starlette
+    # via watchfiles
 appnope==0.1.4
     # via ipykernel
 argon2-cffi==23.1.0
@@ -108,11 +110,14 @@ click==8.1.7
     # via distributed
     # via jupyter-cache
     # via spatialdata
+    # via uvicorn
 cloudpickle==3.0.0
     # via dask
     # via distributed
 codecov-cli==0.7.4
     # via anatomize
+colorama==0.4.6
+    # via sphinx-autobuild
 colorcet==3.1.0
     # via datashader
     # via holoviews
@@ -203,6 +208,7 @@ greenlet==3.0.3
     # via sqlalchemy
 h11==0.14.0
     # via httpcore
+    # via uvicorn
 h5py==3.11.0
     # via anndata
     # via scanpy
@@ -799,11 +805,14 @@ sphinx==8.0.2
     # via numpydoc
     # via pydata-sphinx-theme
     # via scanpydoc
+    # via sphinx-autobuild
     # via sphinx-autodoc-typehints
     # via sphinx-book-theme
     # via sphinx-copybutton
     # via sphinxcontrib-bibtex
     # via sphinxext-opengraph
+sphinx-autobuild==2024.4.16
+    # via anatomize
 sphinx-autodoc-typehints==2.2.3
     # via anatomize
 sphinx-book-theme==1.1.3
@@ -830,6 +839,8 @@ sqlalchemy==2.0.32
     # via jupyter-cache
 stack-data==0.6.3
     # via ipython
+starlette==0.38.2
+    # via sphinx-autobuild
 statsmodels==0.14.2
     # via scanpy
 stdlib-list==0.10.0
@@ -920,9 +931,13 @@ urllib3==2.2.2
     # via requests
     # via responses
     # via twine
+uvicorn==0.30.6
+    # via sphinx-autobuild
 virtualenv==20.26.3
     # via asv
     # via pre-commit
+watchfiles==0.23.0
+    # via sphinx-autobuild
 wcwidth==0.2.13
     # via prompt-toolkit
 webcolors==24.8.0
@@ -932,6 +947,8 @@ webencodings==0.5.1
     # via tinycss2
 websocket-client==1.8.0
     # via jupyter-server
+websockets==13.0
+    # via sphinx-autobuild
 widgetsnbextension==4.0.11
     # via ipywidgets
 wrapt==1.16.0

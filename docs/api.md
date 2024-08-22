@@ -10,4 +10,5 @@
     :toctree: generated
 
     exposure.adjust_gamma
+    exposure.adjust_log
 ```

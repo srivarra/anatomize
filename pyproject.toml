@@ -38,12 +38,13 @@ dependencies = [
 dev = [
     "pre-commit",
     "twine>=4.0.2",
-    "esbonio>=0.16.4",
     "anatomize[nb]",
     "matplotlib>=3.9.2",
     "hvplot>=0.10.0",
     "spatialdata-plot>=0.2.4",
     "asv>=0.6.4",
+    "sphinx-autobuild>=2024.4.16",
+    "esbonio>=0.16.4",
 ]
 doc = [
     "docutils>=0.8,!=0.18.*,!=0.19.*",

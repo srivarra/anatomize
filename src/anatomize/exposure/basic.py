@@ -3,7 +3,7 @@ import xbatcher as xb
 from spatialdata.models import C, X, Y
 
 from anatomize.core.decorators import convert_kwargs_to_xr_vec
-from anatomize.exposure._utils import _gamma, _normalize, _rechunk
+from anatomize.exposure._utils import _gamma, _inv_log, _log, _normalize, _rechunk
 
 
 def iter_channels(image: xr.DataArray) -> xb.BatchGenerator:  # noqa: D103
@@ -14,7 +14,7 @@ def iter_channels(image: xr.DataArray) -> xb.BatchGenerator:  # noqa: D103
 def normalize(
     image: xr.DataArray, q: tuple[float, float] = (0.0, 1.0), return_quantiles: bool = False, **quantile_kwargs
 ) -> xr.DataArray:
-    """Normalize a DataArray's values between 0 and 1.
+    """Normalize a DataArray's values between 0 and 1 using the Quantile method.
 
     Parameters
     ----------
@@ -81,6 +81,42 @@ def adjust_gamma(image: xr.DataArray, gamma: float = 1, gain: float = 1) -> xr.D
         gamma,
         gain,
         input_core_dims=[[Y, X], [], []],
+        output_core_dims=[[Y, X]],
+        dask="parallelized",
+        output_dtypes=[data.dtype],
+        dask_gufunc_kwargs={"allow_rechunk": True},
+    )
+
+
+@convert_kwargs_to_xr_vec("gain")
+def adjust_log(image: xr.DataArray, gain: float = 1, inv=False) -> xr.DataArray:
+    r"""Transforms the image pixelwise using the logarithmic or inverse logarithmic correction.
+
+    Parameters
+    ----------
+    image
+        The image to adjust.
+    gain
+        The constant multiplier, by default 1.
+    inv
+        If True, the inverse logarithmic correction is performed, otherwise
+        the logarithmic correction is performed, by default False.
+
+    Returns
+    -------
+    The logarithmic or inverse logarithmic adjusted image.
+    """
+    ...
+
+    data = _rechunk(image, chunks=None)
+
+    f = _log if not inv else _inv_log
+
+    return xr.apply_ufunc(
+        f,
+        data,
+        gain,
+        input_core_dims=[[Y, X], []],
         output_core_dims=[[Y, X]],
         dask="parallelized",
         output_dtypes=[data.dtype],

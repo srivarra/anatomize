@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 
+import numpy as np
 import xarray as xr
 from numba import guvectorize
 from spatialdata.models import C, X, Y
@@ -45,3 +46,25 @@ def _normalize(Ic, q_min, q_max, out):
 )
 def _gamma(Ic, gamma, gain, out):
     out[:] = (Ic[:] ** gamma[:]) * gain[:]
+
+
+@guvectorize(
+    ["void(float64[:,:], float64[:], float64[:,:])"],
+    "(m,n),(c)->(m,n)",
+    nopython=True,
+    cache=True,
+    target="cpu",
+)
+def _log(Ic, gain, out):
+    out[:] = gain * np.log2(1 + Ic[:])
+
+
+@guvectorize(
+    ["void(float64[:,:], float64[:], float64[:,:])"],
+    "(m,n),(c)->(m,n)",
+    nopython=True,
+    cache=True,
+    target="cpu",
+)
+def _inv_log(Ic, gain, out):
+    out[:] = gain * (2 ** Ic[:] - 1)
