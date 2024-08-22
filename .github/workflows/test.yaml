@@ -69,7 +69,7 @@ jobs:
           PLATFORM: ${{ matrix.os }}
           DISPLAY: :42
         run: |
-          rye run pytest --cov --cov-report=xml -v --color=yes --junitxml=junit.xml
+          rye run pytest -n auto --cov --cov-report=xml -v --color=yes --junitxml=junit.xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         env:
