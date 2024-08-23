@@ -172,6 +172,8 @@ docutils==0.21.2
     # via sphinxcontrib-bibtex
 einx==0.3.0
     # via anatomize
+equinox==0.11.5
+    # via anatomize
 esbonio==0.16.4
     # via anatomize
 execnet==2.1.1
@@ -183,6 +185,7 @@ fasteners==0.19
 fastjsonschema==2.20.0
     # via nbformat
 filelock==3.15.4
+    # via torch
     # via virtualenv
 flox==0.9.10
     # via anatomize
@@ -201,13 +204,12 @@ fsspec==2023.6.0
     # via ome-zarr
     # via s3fs
     # via spatialdata
+    # via torch
     # via universal-pathlib
 geopandas==1.0.1
     # via spatialdata
 graphlib-backport==1.1.0
     # via buckaroo
-greenlet==3.0.3
-    # via sqlalchemy
 h11==0.14.0
     # via httpcore
     # via uvicorn
@@ -269,6 +271,17 @@ jaraco-context==6.0.1
     # via keyring
 jaraco-functools==4.0.2
     # via keyring
+jax==0.4.26
+    # via anatomize
+    # via equinox
+    # via jax-metal
+jax-metal==0.1.0
+    # via anatomize
+jaxlib==0.4.26
+    # via anatomize
+    # via jax-metal
+jaxtyping==0.2.33
+    # via equinox
 jedi==0.19.1
     # via ipython
 jinja2==3.1.4
@@ -281,6 +294,7 @@ jinja2==3.1.4
     # via myst-parser
     # via nbconvert
     # via sphinx
+    # via torch
 jmespath==1.0.1
     # via botocore
 joblib==1.4.2
@@ -386,6 +400,9 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.0.2
     # via nbconvert
+ml-dtypes==0.4.0
+    # via jax
+    # via jaxlib
 more-itertools==10.4.0
     # via jaraco-classes
     # via jaraco-functools
@@ -425,6 +442,7 @@ networkx==3.3
     # via scanpy
     # via scikit-image
     # via spatialdata
+    # via torch
 nh3==0.2.18
     # via readme-renderer
 nodeenv==1.9.1
@@ -466,7 +484,10 @@ numpy==1.26.4
     # via holoviews
     # via hvplot
     # via imageio
+    # via jax
+    # via jaxlib
     # via matplotlib
+    # via ml-dtypes
     # via multiscale-spatial-image
     # via numba
     # via numbagg
@@ -507,6 +528,7 @@ numpydoc==1.8.0
 ome-zarr==0.9.0
     # via spatialdata
 opt-einsum==3.3.0
+    # via jax
     # via xarray
 overrides==7.7.0
     # via jupyter-server
@@ -752,6 +774,8 @@ scipy==1.14.1
     # via dask-image
     # via datashader
     # via flox
+    # via jax
+    # via jaxlib
     # via pynndescent
     # via scanpy
     # via scikit-image
@@ -770,6 +794,7 @@ session-info==1.0.0
 setuptools==73.0.1
     # via anatomize
     # via spatialdata
+    # via torch
     # via tree-sitter
 shapely==2.0.6
     # via geopandas
@@ -777,6 +802,7 @@ shapely==2.0.6
 six==1.16.0
     # via asttokens
     # via bleach
+    # via jax-metal
     # via patsy
     # via pybtex
     # via python-dateutil
@@ -852,6 +878,7 @@ stdlib-list==0.10.0
     # via session-info
 sympy==1.13.2
     # via einx
+    # via torch
 tabulate==0.9.0
     # via asv
     # via jupyter-cache
@@ -878,6 +905,8 @@ toolz==0.12.1
     # via flox
     # via ome-zarr
     # via partd
+torch==2.4.0
+    # via anatomize
 tornado==6.4.1
     # via bokeh
     # via distributed
@@ -909,9 +938,12 @@ tree-sitter==0.20.4
     # via codecov-cli
 twine==5.1.1
     # via anatomize
+typeguard==2.13.3
+    # via jaxtyping
 types-python-dateutil==2.9.0.20240821
     # via arrow
 typing-extensions==4.12.2
+    # via equinox
     # via myst-nb
     # via panel
     # via pydantic
@@ -919,6 +951,7 @@ typing-extensions==4.12.2
     # via pydata-sphinx-theme
     # via spatialdata
     # via sqlalchemy
+    # via torch
     # via xarray-dataclasses
 tzdata==2024.1
     # via pandas
@@ -954,6 +987,8 @@ websocket-client==1.8.0
     # via jupyter-server
 websockets==13.0
     # via sphinx-autobuild
+wheel==0.44.0
+    # via jax-metal
 widgetsnbextension==4.0.11
     # via ipywidgets
 wrapt==1.16.0

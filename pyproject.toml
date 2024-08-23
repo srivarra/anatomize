@@ -80,6 +80,12 @@ test = [
 ]
 
 ci = ["codecov-cli>=0.7.4"]
+jax = [
+    "jax-metal>=0.1.0",
+    "equinox>=0.11.5",
+    "jax==0.4.26",
+    "jaxlib==0.4.26",
+]
 
 [tool.coverage.run]
 source = ["anatomize"]

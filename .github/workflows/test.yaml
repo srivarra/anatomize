@@ -61,7 +61,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          rye sync --update-all --features=test,ci
+          rye sync --no-lock --features=test,ci
 
       - name: Test
         env:
