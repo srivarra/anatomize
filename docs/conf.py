@@ -103,6 +103,8 @@ intersphinx_mapping = {
     "datatree": ("https://datatree.readthedocs.io/en/latest/", None),
     "spatialdata": ("https://spatialdata.readthedocs.io/en/latest/", None),
     "zarr": ("https://zarr.readthedocs.io/en/stable/", None),
+    "boost-histogram": ("https://boost-histogram.readthedocs.io/en/latest/", None),
+    "xarray-histogram": ("https://xarray-histogram.readthedocs.io/en/latest/", None),
 }
 
 # List of patterns, relative to source directory, that match files and

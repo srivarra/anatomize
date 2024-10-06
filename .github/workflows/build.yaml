@@ -17,24 +17,39 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12"]
     steps:
       - name: Checkout ${{ github.ref }}
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: eifinger/setup-rye@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          version: "latest"
           enable-cache: true
-          cache-prefix: "${{ runner.os }}-rye-build"
+          cache-dependency-glob: "uv.lock"
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        run: |
+          uv python install ${{ matrix.python-version }}
 
       - name: Install Dependencies
         run: |
-          rye sync
+          uv sync --all-extras
+
       - name: Build Package
         run: |
-          rye build
-      - name: Check package
+          uv build
+
+      - name: Check Package
         run: |
-          rye run twine check --strict dist/*.whl
+          uv run twine check --strict dist/*.whl
+
+      - name: Store Wheel Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*.whl
