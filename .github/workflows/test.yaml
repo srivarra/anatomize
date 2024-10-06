@@ -7,6 +7,7 @@ on:
     branches: [main]
   schedule:
     - cron: "0 5 1,15 * *"
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,23 +27,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            python: "3.10"
-          - os: ubuntu-latest
-            python: "3.11"
-          - os: ubuntu-latest
-            python: "3.12"
-          - os: ubuntu-latest
-            python: "3.12"
-            pip-flags: "--pre"
-            name: PRE-RELEASE DEPENDENCIES
+        python-version: ["3.10", "3.11", "3.12"]
+        os: ["ubuntu-latest"]
 
-    name: ${{ matrix.name }} Python ${{ matrix.python }}
-
-    env:
-      OS: ${{ matrix.os }}
-      PYTHON: ${{ matrix.python }}
+    name: Python ${{ matrix.python-version }}
 
     environment:
       name: codecov
@@ -51,25 +39,28 @@ jobs:
       - name: Checkout ${{ github.ref }}
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python }}
-        uses: eifinger/setup-rye@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          version: "latest"
           enable-cache: true
-          cache-prefix: "${{ matrix.os }}-rye-${{ matrix.python }}"
+          cache-dependency-glob: "uv.lock"
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        run: |
+          uv python install ${{ matrix.python-version }}
 
       - name: Install Dependencies
         run: |
-          rye sync --update-all --features=test,ci
+          uv sync --all-extras
 
       - name: Test
         env:
           MPLBACKEND: agg
-          PLATFORM: ${{ matrix.os }}
           DISPLAY: :42
         run: |
-          rye run pytest -n auto --cov --cov-report=xml -v --color=yes --junitxml=junit.xml
+          uv run pytest -n auto --cov --cov-report=xml -v --color=yes --junitxml=junit.xml
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         env:
@@ -83,4 +74,4 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          flags: ${{ matrix.os }}-${{ matrix.python }}
+          flags: ${{ matrix.os }}-${{ matrix.python-version }}

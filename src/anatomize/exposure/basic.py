@@ -1,9 +1,20 @@
+from collections.abc import Mapping, Sequence
+
+try:
+    from typing import Unpack
+except ImportError:
+    from typing_extensions import Unpack
+
+import datatree as dt
 import xarray as xr
 import xbatcher as xb
-from spatialdata.models import C, X, Y
+from numpydantic import NDArray
+from xarray.core.types import QuantileMethods
 
-from anatomize.core.decorators import convert_kwargs_to_xr_vec
-from anatomize.exposure._utils import _gamma, _inv_log, _inv_sigmoid, _log, _normalize, _rechunk, _sigmoid
+from anatomize.core import AxisSpec, C, X, Y, convert_kwargs_to_xr_vec, rechunk_image
+from anatomize.core._typeddict_kwargs import QuantileKwargs
+
+from ._utils import _gamma, _histogram, _inv_log, _inv_sigmoid, _log, _normalize, _sigmoid
 
 
 def iter_channels(image: xr.DataArray) -> xb.BatchGenerator:  # noqa: D103
@@ -11,8 +22,14 @@ def iter_channels(image: xr.DataArray) -> xb.BatchGenerator:  # noqa: D103
     return xb.BatchGenerator(image, input_dims={Y: n_y, X: n_x}, batch_dims={C: 1})
 
 
+@rechunk_image
 def normalize(
-    image: xr.DataArray, q: tuple[float, float] = (0.0, 1.0), return_quantiles: bool = False, **quantile_kwargs
+    image: xr.DataArray | dt.DataTree,
+    q: tuple[float, float] = (0.0, 1.0),
+    method: QuantileMethods = "linear",
+    return_quantiles: bool = False,
+    chunk: Mapping[str, int] | None = None,
+    **quantile_kwargs: Unpack[QuantileKwargs],
 ) -> xr.DataArray:
     """Normalize a DataArray's values between 0 and 1 using the Quantile method.
 
@@ -33,10 +50,7 @@ def normalize(
     xr.DataArray
         Either the normalized image or a DataArray with the quantiles used to normalize the image.
     """
-    data = _rechunk(image, chunks=None)
-
-    quantiles = data.quantile(q, dim=[Y, X], **quantile_kwargs)
-
+    quantiles = image.quantile(q=q, dim=[Y, X], method=method, **quantile_kwargs)
     if return_quantiles:
         return quantiles
     else:
@@ -44,19 +58,22 @@ def normalize(
 
         return xr.apply_ufunc(
             _normalize,
-            data,
+            image,
             q_min_xr,
             q_max_xr,
             input_core_dims=[[Y, X], [], []],
             output_core_dims=[[Y, X]],
             dask="parallelized",
-            output_dtypes=[data.dtype],
+            output_dtypes=[image.dtype],
             dask_gufunc_kwargs={"allow_rechunk": True},
         )
 
 
+@rechunk_image
 @convert_kwargs_to_xr_vec("gamma", "gain")
-def adjust_gamma(image: xr.DataArray, gamma: float = 1, gain: float = 1) -> xr.DataArray:
+def adjust_gamma(
+    image: xr.DataArray, gamma: float = 1, gain: float = 1, chunks: Mapping[str, int] | None = None
+) -> xr.DataArray:
     """Performs Gamma Correction on the input image.
 
     Parameters
@@ -73,24 +90,25 @@ def adjust_gamma(image: xr.DataArray, gamma: float = 1, gain: float = 1) -> xr.D
     xr.DataArray
         The adjusted image.
     """
-    data = _rechunk(image, chunks=None)
-
     return xr.apply_ufunc(
         _gamma,
-        data,
+        image,
         gamma,
         gain,
         input_core_dims=[[Y, X], [], []],
         output_core_dims=[[Y, X]],
         dask="parallelized",
-        output_dtypes=[data.dtype],
+        output_dtypes=[image.dtype],
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
 
 
+@rechunk_image
 @convert_kwargs_to_xr_vec("gain")
-def adjust_log(image: xr.DataArray, gain: float = 1, inv=False) -> xr.DataArray:
-    r"""Transforms the image pixelwise using the logarithmic or inverse logarithmic correction.
+def adjust_log(
+    image: xr.DataArray, gain: float = 1, inv=False, chunks: Mapping[str, int] | None = None
+) -> xr.DataArray:
+    """Transforms the image pixelwise using the logarithmic or inverse logarithmic correction.
 
     Parameters
     ----------
@@ -108,24 +126,25 @@ def adjust_log(image: xr.DataArray, gain: float = 1, inv=False) -> xr.DataArray:
     """
     ...
 
-    data = _rechunk(image, chunks=None)
-
     f = _log if not inv else _inv_log
 
     return xr.apply_ufunc(
         f,
-        data,
+        image,
         gain,
         input_core_dims=[[Y, X], []],
         output_core_dims=[[Y, X]],
         dask="parallelized",
-        output_dtypes=[data.dtype],
+        output_dtypes=[image.dtype],
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
 
 
+@rechunk_image
 @convert_kwargs_to_xr_vec("cutoff", "gain")
-def adjust_sigmoid(image: xr.DataArray, cutoff: float = 0.5, gain: float = 10, inv=False) -> xr.DataArray:
+def adjust_sigmoid(
+    image: xr.DataArray, cutoff: float = 0.5, gain: float = 10, inv=False, chunks: Mapping[str, int] | None = None
+) -> xr.DataArray:
     """Performs Sigmoid Correction on the input image.
 
     Parameters
@@ -144,18 +163,145 @@ def adjust_sigmoid(image: xr.DataArray, cutoff: float = 0.5, gain: float = 10, i
     -------
     The sigmoid adjusted image.
     """
-    data = _rechunk(image, chunks=None)
-
     f = _sigmoid if not inv else _inv_sigmoid
 
     return xr.apply_ufunc(
         f,
-        data,
+        image,
         cutoff,
         gain,
         input_core_dims=[[Y, X], [], []],
         output_core_dims=[[Y, X]],
         dask="parallelized",
-        output_dtypes=[data.dtype],
+        output_dtypes=[image.dtype],
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
+
+
+@rechunk_image
+def histogram(
+    image: xr.DataArray,
+    bins: Sequence[AxisSpec] | Mapping[str, AxisSpec] | AxisSpec,
+    weight: xr.DataArray | None = None,
+    density: bool = False,
+    chunks: Mapping[str, int] | None = None,
+) -> xr.DataArray:
+    """Compute the histogram of the multichannel image.
+
+    Parameters
+    ----------
+    image
+        The image to compute the histogram of.
+    bins
+        Sequence of specifications for the histogram bins, in the same order as the
+        variables of `data`. These are passed to :func:`xarray-histogram.histogram`
+
+        Specification can either be:
+
+        * a :class:`boost_histogram.axis.Axis`.
+        * a tuple consisting of (number of bins, minimum value, maximum value) in which case the
+          bins will be linearly spaced
+        * only the number of bins, the minimum and maximum values are then computed from
+          the data on the spot.
+        * A mapping of channel names `C` to the specifications for the histogram bins.
+    density
+        If true normalize the histogram so that its integral is one. Does not take into account weight, by default False.
+
+    Returns
+    -------
+    DataArray named `image_histogram`. The bins coordinates are named image_bins.
+    """
+    match bins:
+        case int():
+            bins = (bins,)
+        case _:
+            pass
+
+    hist = _histogram(image, bins=bins, dims=[Y, X], density=density)
+    return hist
+
+
+@rechunk_image
+def cumulative_distribution(
+    image: xr.DataArray,
+    bins: Sequence[AxisSpec] | Mapping[str, AxisSpec] | AxisSpec,
+    density: bool = False,
+    chunks: Mapping[str, int] | None = None,
+) -> xr.DataArray:
+    """Compute the cumulative distribution of the image.
+
+    Parameters
+    ----------
+    image
+        The image to compute the cumulative distribution of.
+    bins
+        The number of bins to use for the cumulative distribution, by default 256.
+
+    Returns
+    -------
+    xr.DataArray
+        The cumulative distribution of the image.
+    """
+    data_hist = histogram(image, bins, density=density)  # noqa: F841
+
+    # data_hist.hist.cdf(x=)
+
+    # return xr.apply_ufunc(
+    #     _cumulative_distribution,
+    #     data,
+    #     nbins,
+    #     input_core_dims=[[Y, X], []],
+    #     output_core_dims=[[Y, X]],
+    #     dask="parallelized",
+    #     output_dtypes=[data.dtype],
+    #     dask_gufunc_kwargs={"allow_rechunk": True},
+    # )
+
+
+@rechunk_image
+def equalize_histogram(
+    image: xr.DataArray,
+    bins: Sequence[AxisSpec] | Mapping[str, AxisSpec] | AxisSpec,
+    density: bool = False,
+    mask: xr.DataArray | NDArray | None = None,
+    chunks: Mapping[str, int] | None = None,
+):
+    """#TODO."""
+    ...
+
+
+@rechunk_image
+def equalize_clhae(
+    image: xr.DataArray,
+    bins: Sequence[AxisSpec] | Mapping[str, AxisSpec] | AxisSpec,
+    density: bool = False,
+    mask: xr.DataArray | NDArray | None = None,
+    chunks: Mapping[str, int] | None = None,
+):
+    """#TODO."""
+    ...
+
+
+@rechunk_image
+@convert_kwargs_to_xr_vec("fraction_threshold")
+def is_low_contrast(
+    image: xr.DataArray,
+    q: tuple[float, float] = (0.1, 0.9),
+    method: QuantileMethods = "linear",
+    fraction_threshold: float = 0.05,
+    chunks: Mapping[str, int] | None = None,
+    **quantile_kwargs: Unpack[QuantileKwargs],
+) -> xr.DataArray:
+    """#TODO."""
+    min_q, max_q = image.quantile(q=q, dim=[Y, X], **quantile_kwargs)
+
+    ratio: xr.DataArray = max_q - min_q
+
+    return ratio < fraction_threshold
+
+
+def rescale_intensity(
+    image: xr.DataArray, in_range: str | tuple[str, str] = "image", out_range: str | tuple[str, str] = "dtype"
+):
+    """#TODO."""
+    ...

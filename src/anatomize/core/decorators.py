@@ -1,19 +1,20 @@
+import functools as ft
 import inspect
 from collections.abc import Callable
-from functools import wraps
 from inspect import BoundArguments
-from typing import Concatenate, ParamSpec, TypeVar
+from typing import Any, Concatenate, ParamSpec, TypeVar
 
 import dask.array as da
 import numpy as np
 import xarray as xr
-from spatialdata.models import C, get_channels
+
+from .models import C, X, Y, get_channels
 
 P = ParamSpec("P")
 T = TypeVar("T")
 
 
-def _kwarg_to_vec(value, n_c, cs, name):
+def _kwarg_to_vec(value: Any, n_c: int, cs, name: str):
     return xr.DataArray(data=da.from_array(np.repeat(value, n_c), chunks=n_c), coords={C: cs}, name=name)
 
 
@@ -83,9 +84,9 @@ def convert_kwargs_to_xr_vec(*arg_names: str) -> Callable[[Callable[..., T]], Ca
     def kwarg_to_xr_decorator(f: Callable[P, T]) -> Callable[Concatenate[str, P], T]:
         sig = inspect.signature(f)
 
-        @wraps(f)
+        @ft.wraps(f)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> Callable[Concatenate[str, P], T]:
-            bound = sig.bind(*args, **kwargs)
+            bound: BoundArguments = sig.bind(*args, **kwargs)
             bound.apply_defaults()
             _convert_kwarg_to_xr_vec(bound, *arg_names)
             return f(*bound.args, **bound.kwargs)
@@ -93,3 +94,42 @@ def convert_kwargs_to_xr_vec(*arg_names: str) -> Callable[[Callable[..., T]], Ca
         return wrapper
 
     return kwarg_to_xr_decorator
+
+
+def _rechunk(bound: BoundArguments) -> None:
+    image: xr.DataArray = bound.arguments["image"]
+    chunks = bound.arguments["chunks"]
+    n_c, n_y, n_x = image.shape
+    if chunks is None and image.chunks == ((1,) * n_c, (n_y,), (n_x,)):
+        bound.arguments["image"] = image
+    elif chunks is None:
+        chunks = {C: 1, Y: n_y, X: n_x}
+        bound.arguments["image"] = image.chunk(chunks)
+    else:
+        bound.arguments["image"] = image.chunk(chunks)
+
+
+def rechunk_image(f: Callable[P, T]) -> Callable[Concatenate[str, P], T]:
+    """A decorator that rechunks the image if it is not already chunked.
+
+    Looks for the `image` parameter in the signature of the function.
+
+    Parameters
+    ----------
+    f
+        The function to decorate.
+
+    Returns
+    -------
+    The function with the image rechunked if it is not already chunked.
+    """
+    sig = inspect.signature(f)
+
+    @ft.wraps(f)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Callable[Concatenate[str, P], T]:
+        bound: BoundArguments = sig.bind(*args, **kwargs)
+        bound.apply_defaults()
+        _rechunk(bound)
+        return f(*bound.args, **bound.kwargs)
+
+    return wrapper
