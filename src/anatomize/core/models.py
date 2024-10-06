@@ -45,7 +45,7 @@ def get_channels(data) -> list:
 
 @get_channels.register
 def _(data: xr.DataArray) -> list[Hashable]:
-    return data.coords[C].to_numpy().to_list()
+    return data.coords[C].to_numpy().tolist()
 
 
 @get_channels.register
