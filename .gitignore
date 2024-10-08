@@ -29,3 +29,6 @@ __pycache__/
 /.vscode/
 *.zarr/
 /.scripts/
+
+# Coverage
+.coverage*

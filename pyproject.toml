@@ -13,9 +13,6 @@ authors = [{ name = "Sricharan Reddy Varra" }]
 maintainers = [
     { name = "Sricharan Reddy Varra", email = "srivarra@stanford.edu" },
 ]
-urls.Documentation = "https://anatomize.readthedocs.io/"
-urls.Source = "https://github.com/srivarra/anatomize"
-urls.Home-page = "https://github.com/srivarra/anatomize"
 dependencies = [
     "anndata",
     # for debug logging (referenced from the issue template)
@@ -34,10 +31,8 @@ dependencies = [
     "boost-histogram>=1.5.0",
     "dask-histogram>=2024.9.1",
 ]
-
-[project.optional-dependencies]
-spatialdata = ["spatialdata>=0.2.2"]
-dev = [
+optional-dependencies.spatialdata = ["spatialdata"]
+optional-dependencies.dev = [
     "pre-commit",
     "twine>=4.0.2",
     "anatomize[nb]",
@@ -48,39 +43,42 @@ dev = [
     "sphinx-autobuild>=2024.4.16",
     "esbonio>=0.16.4",
 ]
-doc = [
+optional-dependencies.doc = [
     "docutils>=0.8,!=0.18.*,!=0.19.*",
-    "sphinx>=4",
-    "sphinx-book-theme>=1.0.0",
-    "myst-nb>=1.1.0",
-    "sphinxcontrib-bibtex>=1.0.0",
-    "setuptools",
+    "ipykernel",
+    "ipython",
+    "myst-nb>=1.1",
+    "pandas",
     # Until pybtex >0.23.0 releases: https://bitbucket.org/pybtex-devs/pybtex/issues/169/
+    "setuptools",
+    "sphinx>=4",
     "sphinx-autodoc-typehints",
+    "sphinx-book-theme>=1",
+    "sphinx-copybutton",
+    "sphinx-tabs",
+    "sphinxcontrib-bibtex>=1",
     "sphinxext-opengraph",
-    # For notebooks
     "ipykernel",
     "ipython",
     "sphinx-copybutton",
-    "pandas",
     "numpydoc>=1.8.0",
     "scanpydoc>=0.13.6",
 ]
-nb = [
+optional-dependencies.test = [
+    "coverage",
+    "pytest",
+]
+optional-dependencies.ci = ["codecov-cli>=0.7.4"]
+optional-dependencies.nb = [
     "jupyterlab",
     "notebook",
     "ipylab>=1.0.0",
     "buckaroo>=0.6.12",
     "jupyter-bokeh>=4.0.5",
 ]
-test = [
-    "pytest",
-    "coverage",
-    "hypothesis>=6.111.1",
-    "pytest-cov>=5.0.0",
-    "pytest-xdist>=3.6.1",
-]
-ci = ["codecov-cli>=0.7.4"]
+urls.Documentation = "https://anatomize.readthedocs.io/"
+urls.Source = "https://github.com/srivarra/anatomize"
+urls.Home-page = "https://github.com/srivarra/anatomize"
 
 [tool.coverage.run]
 source = ["anatomize"]
