@@ -7,7 +7,7 @@ name = "anatomize"
 dynamic = ["version"]
 description = "A very interesting piece of code"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "Sricharan Reddy Varra" }]
 maintainers = [
