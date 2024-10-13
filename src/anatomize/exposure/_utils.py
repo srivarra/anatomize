@@ -1,12 +1,5 @@
 from collections.abc import Collection, Hashable, Sequence
-from typing import Literal
-
-from anatomize.core._typeddict_kwargs import PartitionedFactoryKwargs
-
-try:
-    from typing import Unpack
-except ImportError:
-    from typing import Unpack
+from typing import Literal, Unpack
 
 import boost_histogram as bh
 import dask_histogram as dh
@@ -16,6 +9,7 @@ from numba import guvectorize
 from numpydantic import NDArray, dtype
 from numpydantic.validation import validate_dtype
 
+from anatomize.core._typeddict_kwargs import PartitionedFactoryKwargs
 from anatomize.core.models import AxisSpec
 
 

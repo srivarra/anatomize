@@ -1,15 +1,9 @@
 import warnings
 from collections.abc import Mapping, Sequence
-from typing import Literal
-
-import numpy as np
-
-try:
-    from typing import Unpack
-except ImportError:
-    from typing_extensions import Unpack
+from typing import Literal, Unpack
 
 import datatree as dt
+import numpy as np
 import xarray as xr
 import xbatcher as xb
 from numpydantic import NDArray

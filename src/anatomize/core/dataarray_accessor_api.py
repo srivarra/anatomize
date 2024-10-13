@@ -1,14 +1,10 @@
 from collections.abc import Mapping
+from typing import Unpack
 
 import xarray as xr
 from xarray.core.types import QuantileMethods
 
 from anatomize.core._typeddict_kwargs import QuantileKwargs
-
-try:
-    from typing import Unpack
-except ImportError:
-    from typing_extensions import Unpack
 
 
 @xr.register_dataarray_accessor("an")
