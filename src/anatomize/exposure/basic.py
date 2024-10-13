@@ -7,7 +7,7 @@ import numpy as np
 try:
     from typing import Unpack
 except ImportError:
-    from typing import Unpack
+    from typing_extensions import Unpack
 
 import datatree as dt
 import xarray as xr
