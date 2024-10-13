@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/scverse/cookiecutter-scverse",
-  "commit": "384fc74318d2afc7ad1d5bda7d0fb3dfbe2fea28",
+  "commit": "4a5673ef25162ce07e98b39e77f5bea06ec1461e",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -10,8 +10,9 @@
       "author_full_name": "Sricharan Reddy Varra",
       "author_email": "srivarra@stanford.edu",
       "github_user": "srivarra",
-      "project_repo": "https://github.com/srivarra/anatomize",
+      "github_repo": "anatomize",
       "license": "MIT License",
+      "ide_integration": true,
       "_copy_without_render": [
         ".github/workflows/build.yaml",
         ".github/workflows/test.yaml",

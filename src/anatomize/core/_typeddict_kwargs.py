@@ -1,9 +1,6 @@
-try:
-    from typing import TypedDict
-except ImportError:
-    from typing_extensions import TypedDict
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import TypedDict
 
 import boost_histogram as bh
 from dask.typing import DaskCollection

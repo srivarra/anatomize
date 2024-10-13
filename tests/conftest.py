@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from spatialdata import SpatialData
 from spatialdata.datasets import blobs
@@ -21,3 +22,10 @@ def blobs_sdata_store(tmp_path_factory: pytest.TempdirFactory) -> UPath:
     blobs_sdata_path = UPath(tmp_path_factory.mktemp("blobs_sdata") / "blobs_sdata.zarr")
     blobs_sdata.write(file_path=blobs_sdata_path)
     return blobs_sdata_path
+
+
+# Create a fixture for numpy rng generator
+@pytest.fixture(scope="session", autouse=True, name="numpy_rng")
+def numpy_rng() -> np.random.Generator:
+    """A fixture that provides a NumPy random number generator."""
+    return np.random.default_rng(12345)

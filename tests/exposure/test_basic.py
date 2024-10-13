@@ -48,3 +48,23 @@ def test_adjust_sigmoid(blobs_sdata_store: UPath, cutoff: float, gain: float, in
         dims=blobs_sdata.images["blobs_image"].dims,
     )
     xr.testing.assert_allclose(a=blobs_image_sigmoid_xr, b=blobs_image_sigmoid_skimage, atol=1e-10)
+
+
+@pytest.mark.parametrize("in_range", ["image", "dtype", (0, 1)])
+@pytest.mark.parametrize("out_range", ["image", "dtype", (0, 1)])
+def test_rescale_intensity(
+    blobs_sdata_store: UPath, in_range: str | tuple[float, float], out_range: str | tuple[float, float]
+):
+    blobs_sdata = sd.read_zarr(blobs_sdata_store)
+
+    blobs_image_rescaled_xr = an_exposure.rescale_intensity(
+        image=blobs_sdata.images["blobs_image"], in_range="image", out_range="dtype"
+    )
+
+    blobs_image_sigmoid_skimage = xr.DataArray(
+        data=exposure.rescale_intensity(blobs_sdata.images["blobs_image"], in_range="image", out_range="dtype"),
+        coords=blobs_sdata.images["blobs_image"].coords,
+        dims=blobs_sdata.images["blobs_image"].dims,
+    )
+
+    xr.testing.assert_allclose(a=blobs_image_rescaled_xr, b=blobs_image_sigmoid_skimage, atol=1e-10)

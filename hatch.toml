@@ -3,3 +3,21 @@ source = "vcs"
 
 [build.targets.wheel]
 packages = ["src/anatomize"]
+
+[envs.default]
+installer = "uv"
+features = ["dev"]
+
+[envs.docs]
+features = ["doc", "dev"]
+scripts.build = "sphinx-build -M html docs docs/_build {args}"
+scripts.open = "python -m webbrowser -t docs/_build/html/index.html"
+scripts.clean = "git clean -fdX -- {args:docs}"
+
+[envs.hatch-test]
+features = ["test", "spatialdata"]
+extra-args=["-vv", "--color=yes"]
+parallel = true
+
+[[envs.hatch-test.matrix]]
+python = ["3.11", "3.12"]

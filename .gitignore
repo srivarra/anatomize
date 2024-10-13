@@ -6,17 +6,12 @@ buck-out/
 # Compiled files
 .venv/
 __pycache__/
-.mypy_cache/
-.ruff_cache/
+.*_cache/
 
 # Distribution / packaging
-/build/
 /dist/
-/*.egg-info/
 
 # Tests and coverage
-/.pytest_cache/
-/.cache/
 /data/
 /node_modules/
 
@@ -29,3 +24,7 @@ __pycache__/
 /.vscode/
 *.zarr/
 /.scripts/
+
+# Coverage
+.coverage*
+.python-version

@@ -1,11 +1,9 @@
+import warnings
 from collections.abc import Mapping, Sequence
-
-try:
-    from typing import Unpack
-except ImportError:
-    from typing_extensions import Unpack
+from typing import Literal, Unpack
 
 import datatree as dt
+import numpy as np
 import xarray as xr
 import xbatcher as xb
 from numpydantic import NDArray
@@ -14,7 +12,17 @@ from xarray.core.types import QuantileMethods
 from anatomize.core import AxisSpec, C, X, Y, convert_kwargs_to_xr_vec, rechunk_image
 from anatomize.core._typeddict_kwargs import QuantileKwargs
 
-from ._utils import _gamma, _histogram, _inv_log, _inv_sigmoid, _log, _normalize, _sigmoid
+from ._utils import (
+    _gamma,
+    _histogram,
+    _intensity_range,
+    _inv_log,
+    _inv_sigmoid,
+    _log,
+    _normalize,
+    _output_dtype,
+    _sigmoid,
+)
 
 
 def iter_channels(image: xr.DataArray) -> xb.BatchGenerator:  # noqa: D103
@@ -293,7 +301,7 @@ def is_low_contrast(
     **quantile_kwargs: Unpack[QuantileKwargs],
 ) -> xr.DataArray:
     """#TODO."""
-    min_q, max_q = image.quantile(q=q, dim=[Y, X], **quantile_kwargs)
+    min_q, max_q = image.quantile(q=q, dim=[Y, X], method=method, **quantile_kwargs)
 
     ratio: xr.DataArray = max_q - min_q
 
@@ -301,7 +309,37 @@ def is_low_contrast(
 
 
 def rescale_intensity(
-    image: xr.DataArray, in_range: str | tuple[str, str] = "image", out_range: str | tuple[str, str] = "dtype"
+    image: xr.DataArray,
+    in_range: Literal["image", "dtype"] | tuple[int, int] = "image",
+    out_range: Literal["image", "dtype"] | tuple[int, int] = "dtype",
 ):
     """#TODO."""
-    ...
+    if out_range in ["image", "dtype"]:
+        out_dtype = _output_dtype(image.dtype.type, image.dtype)
+    else:
+        out_dtype = _output_dtype(out_range, image.dtype)
+
+    in_min, in_max = map(float, _intensity_range(image, in_range))
+    out_min, out_max = map(float, _intensity_range(image, out_range, clip_negative=(in_min >= 0)))
+    if np.any(nans := np.isnan([in_min, in_max, out_min, out_max])):
+        # Get the value which is nan from the nans list
+        nan_variables = [
+            var for var, is_nan in zip(["in_min", "in_max", "out_min", "out_max"], nans, strict=False) if is_nan
+        ]
+        warnings.warn(
+            message=(
+                f"One or more intensity levels are NaN: {', '.join(nan_variables)}. Rescaling will broadcast NaN to the full image."
+                "To avoid this, provide the intensity levels yourself e.g. (`np.nanmin(image)`, `np.nanmax(image)`)"
+            ),
+            stacklevel=2,
+        )
+    image_input_clip = image.clip(min=in_min, max=in_max).compute()
+    if in_min != in_max:
+        image_output_clip = (
+            (((image_input_clip - in_min) / (in_max - in_min)) * (out_max - out_min) + out_min)
+            .compute()
+            .astype(dtype=out_dtype)
+        )
+    else:
+        image_output_clip = image_input_clip.clip(min=out_min, max=out_max).compute().astype(dtype=out_dtype)
+    return image_output_clip
