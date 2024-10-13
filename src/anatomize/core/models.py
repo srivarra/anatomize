@@ -49,7 +49,7 @@ def _(data: xr.DataArray) -> list[Hashable]:
 
 
 @get_channels.register
-def _(data: dt.DataTree) -> list:
+def _(data: dt.DataTree) -> list[Hashable]:
     name = first({first(data[i].data_vars.keys()) for i in data})
     channels = {tuple(data[i][name].coords[C].to_numpy()) for i in data}
     if len(channels) > 1:

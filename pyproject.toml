@@ -20,7 +20,7 @@ dependencies = [
     "numpy<2",
     "numba",
     "pandas[performance]",
-    "numpydantic[zarr,dask]>=1.6.3",
+    "numpydantic[zarr,dask]>=1.6.4",
     "xarray[accel,parallel]",
     "dask[array,distributed,diagnostics]",
     "flox>=0.9.13",
@@ -35,13 +35,13 @@ optional-dependencies.spatialdata = ["spatialdata"]
 optional-dependencies.dev = [
     "pre-commit",
     "twine>=4.0.2",
-    "anatomize[nb]",
     "matplotlib>=3.9.2",
     "hvplot>=0.10.0",
     "spatialdata-plot>=0.2.4",
     "asv>=0.6.4",
     "sphinx-autobuild>=2024.4.16",
     "esbonio>=0.16.4",
+    "anatomize[nb]",
 ]
 optional-dependencies.doc = [
     "docutils>=0.8,!=0.18.*,!=0.19.*",
@@ -67,6 +67,8 @@ optional-dependencies.doc = [
 optional-dependencies.test = [
     "coverage",
     "pytest",
+    "pytest-cov",
+    "pytest-xdist",
 ]
 optional-dependencies.ci = ["codecov-cli>=0.7.4"]
 optional-dependencies.nb = [

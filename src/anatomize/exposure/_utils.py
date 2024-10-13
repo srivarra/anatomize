@@ -1,18 +1,20 @@
 from collections.abc import Collection, Hashable, Sequence
+from typing import Literal
 
 from anatomize.core._typeddict_kwargs import PartitionedFactoryKwargs
 
 try:
     from typing import Unpack
 except ImportError:
-    from typing_extensions import Unpack
+    from typing import Unpack
 
 import boost_histogram as bh
 import dask_histogram as dh
 import numpy as np
 import xarray as xr
 from numba import guvectorize
-from numpydantic import NDArray
+from numpydantic import NDArray, dtype
+from numpydantic.validation import validate_dtype
 
 from anatomize.core.models import AxisSpec
 
@@ -305,3 +307,76 @@ def manage_bins_input(bins: Sequence[AxisSpec], data: Sequence[xr.DataArray]) ->
             case _:
                 raise TypeError(f"Invalid bin specification: {spec}")
     return bins_out
+
+
+new_float_type = {
+    # preserved types
+    np.float32().dtype.char: np.float32,
+    np.float64().dtype.char: np.float64,
+    np.complex64().dtype.char: np.complex64,
+    np.complex128().dtype.char: np.complex128,
+    # altered types
+    np.float16().dtype.char: np.float32,
+    "g": np.float64,  # np.float128 ; doesn't exist on windows
+    "G": np.complex128,  # np.complex256 ; doesn't exist on windows
+}
+
+
+def _supported_float_type(input_dtype, allow_complex: False):
+    if isinstance(input_dtype, tuple):
+        return np.result_type(*(_supported_float_type(d) for d in input_dtype))
+    input_dtype = np.dtype(input_dtype)
+    if not allow_complex and input_dtype.kind == "c":
+        raise ValueError("complex valued input is not supported")
+    return new_float_type.get(input_dtype.char, np.float64)
+
+
+def _output_dtype(dtype_or_range, image_dtype):
+    if isinstance(dtype_or_range, list | tuple | NDArray):
+        # pair of values: always return float.
+        return _supported_float_type(image_dtype, allow_complex=False)
+    if isinstance(dtype_or_range, dtype.Dtype):
+        # already a type: return it
+        return dtype_or_range
+    if validate_dtype(dtype=dtype_or_range, target=dtype.Float + dtype.Integer):
+        try:
+            # if it's a canonical numpy dtype, convert
+            return np.dtype(dtype_or_range).type
+        except TypeError:  # uint10, uint12, uint14
+            # otherwise, return uint16
+            return np.uint16
+    else:
+        raise ValueError(
+            "Incorrect value for out_range, should be a valid image data "
+            f"type or a pair of values, got {dtype_or_range}."
+        )
+
+
+dtype_range = {
+    bool: (False, True),
+    dtype.Bool: (False, True),
+    **{d: (-1, 1) for d in dtype.Float},
+}
+
+
+def _intensity_range(
+    image: xr.DataArray, range_values: Literal["image", "dtype"] | tuple[int, int], clip_negative: bool = False
+):
+    if range_values == "dtype":
+        range_values = image.dtype.type
+
+    if range_values == "image":
+        i_min = image.min()
+        i_max = image.max()
+    elif range_values in dtype_range:
+        i_min, i_max = dtype_range[range_values]
+        if clip_negative:
+            i_min = max(i_min, 0)
+    elif np.all([validate_dtype(dtype=np.array(rv).dtype, target=dtype.Number) for rv in range_values]):
+        i_min, i_max = (np.array(rv) if isinstance(rv, int | float) else rv for rv in range_values)
+    else:
+        raise ValueError(
+            "Incorrect value for range_values, should be a valid input",
+            f"type or a pair of values, got {range_values}.",
+        )
+    return (i_min, i_max)
